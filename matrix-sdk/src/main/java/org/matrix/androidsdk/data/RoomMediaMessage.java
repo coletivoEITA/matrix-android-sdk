@@ -43,11 +43,17 @@ import org.matrix.androidsdk.util.ResourceUtils;
 import android.util.Pair;
 import android.webkit.MimeTypeMap;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -103,6 +109,8 @@ public class RoomMediaMessage implements Parcelable {
 
     // thumbnail size
     private Pair<Integer, Integer> mThumbnailSize = new Pair<>(100, 100);
+
+    private JsonObject mContentExtras = new JsonObject();
 
     // upload media upload listener
     private transient IMXMediaUploadListener mMediaUploadListener;
@@ -189,6 +197,8 @@ public class RoomMediaMessage implements Parcelable {
         }
 
         mFileName = unformatNullString(source.readString());
+
+        mContentExtras = new JsonParser().parse(source.readString()).getAsJsonObject();
     }
 
     @Override
@@ -296,6 +306,8 @@ public class RoomMediaMessage implements Parcelable {
         }
 
         dest.writeString(formatNullString(mFileName));
+
+        dest.writeString(mContentExtras.toString());
     }
 
     // Creator
@@ -682,6 +694,35 @@ public class RoomMediaMessage implements Parcelable {
         }
 
         return fileUri;
+    }
+
+    /**
+     * Adds extra content to be sent in event's content
+     *
+     * @param key
+     * @param value
+     */
+    public void addContentExtra(String key, JsonElement value) {
+        mContentExtras.add(key, value);
+    }
+
+    /**
+     * @param key
+     * @return
+     */
+    public JsonElement getContentExtra(String key) {
+        return mContentExtras.get(key);
+    }
+
+    /**
+     * @param key
+     */
+    public void removeContentExtra(String key) {
+        mContentExtras.remove(key);
+    }
+
+    protected JsonObject getContentExtras() {
+        return mContentExtras;
     }
 
     //==============================================================================================================

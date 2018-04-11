@@ -28,6 +28,10 @@ import android.text.Html;
 import android.text.TextUtils;
 import android.util.Pair;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+
 import org.matrix.androidsdk.MXDataHandler;
 import org.matrix.androidsdk.crypto.MXEncryptedAttachments;
 import org.matrix.androidsdk.db.MXMediasCache;
@@ -51,6 +55,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Room helper to send media messages in the right order.
@@ -133,6 +138,11 @@ class RoomMediaMessagesSender {
                         message = buildVideoMessage(roomMediaMessage);
                     } else {
                         message = buildFileMessage(roomMediaMessage);
+                    }
+
+                    JsonObject contentExtras = roomMediaMessage.getContentExtras();
+                    for(Map.Entry<String,JsonElement> pair: contentExtras.entrySet()) {
+                        message.add(pair.getKey(),pair.getValue());
                     }
 
                     if (null == message) {

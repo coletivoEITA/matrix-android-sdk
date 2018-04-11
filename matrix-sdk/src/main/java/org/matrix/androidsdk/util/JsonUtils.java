@@ -25,6 +25,7 @@ import com.google.gson.JsonObject;
 
 import org.matrix.androidsdk.data.RoomState;
 import org.matrix.androidsdk.rest.json.ConditionDeserializer;
+import org.matrix.androidsdk.rest.json.MessageSerializer;
 import org.matrix.androidsdk.rest.model.ContentResponse;
 import org.matrix.androidsdk.rest.model.crypto.EncryptedEventContent;
 import org.matrix.androidsdk.rest.model.Event;
@@ -103,6 +104,10 @@ public class JsonUtils {
             .setFieldNamingStrategy(new MatrixFieldNamingStrategy())
             .excludeFieldsWithModifiers(Modifier.PRIVATE, Modifier.STATIC)
             .registerTypeAdapter(Condition.class, new ConditionDeserializer())
+            .registerTypeAdapter(Message.class, new MessageSerializer())
+            .registerTypeAdapter(ImageMessage.class, new MessageSerializer())
+            .registerTypeAdapter(VideoMessage.class, new MessageSerializer())
+            .registerTypeAdapter(FileMessage.class, new MessageSerializer())
             .create();
 
     // add a call to serializeNulls().
@@ -113,6 +118,10 @@ public class JsonUtils {
             .excludeFieldsWithModifiers(Modifier.PRIVATE, Modifier.STATIC)
             .serializeNulls()
             .registerTypeAdapter(Condition.class, new ConditionDeserializer())
+            .registerTypeAdapter(Message.class, new MessageSerializer())
+            .registerTypeAdapter(ImageMessage.class, new MessageSerializer())
+            .registerTypeAdapter(VideoMessage.class, new MessageSerializer())
+            .registerTypeAdapter(FileMessage.class, new MessageSerializer())
             .create();
 
     // for crypto (canonicalize)
@@ -122,6 +131,10 @@ public class JsonUtils {
             .disableHtmlEscaping()
             .excludeFieldsWithModifiers(Modifier.PRIVATE, Modifier.STATIC)
             .registerTypeAdapter(Condition.class, new ConditionDeserializer())
+            .registerTypeAdapter(Message.class, new MessageSerializer())
+            .registerTypeAdapter(ImageMessage.class, new MessageSerializer())
+            .registerTypeAdapter(VideoMessage.class, new MessageSerializer())
+            .registerTypeAdapter(FileMessage.class, new MessageSerializer())
             .create();
 
     /**
@@ -219,27 +232,35 @@ public class JsonUtils {
 
             // Try to return the right subclass
             if (Message.MSGTYPE_IMAGE.equals(message.msgtype)) {
-                return toImageMessage(jsonObject);
+                message = toImageMessage(jsonObject);
             }
 
-            if (Message.MSGTYPE_VIDEO.equals(message.msgtype)) {
-                return toVideoMessage(jsonObject);
+            else if (Message.MSGTYPE_VIDEO.equals(message.msgtype)) {
+                message = toVideoMessage(jsonObject);
             }
 
-            if (Message.MSGTYPE_LOCATION.equals(message.msgtype)) {
-                return toLocationMessage(jsonObject);
+            else if (Message.MSGTYPE_LOCATION.equals(message.msgtype)) {
+                message = toLocationMessage(jsonObject);
             }
 
             // Try to return the right subclass
-            if (Message.MSGTYPE_FILE.equals(message.msgtype)) {
-                return toFileMessage(jsonObject);
+            else if (Message.MSGTYPE_FILE.equals(message.msgtype)) {
+                message = toFileMessage(jsonObject);
             }
 
-            if (Message.MSGTYPE_AUDIO.equals(message.msgtype)) {
-                return toAudioMessage(jsonObject);
+            else if (Message.MSGTYPE_AUDIO.equals(message.msgtype)) {
+                message = toAudioMessage(jsonObject);
             }
 
-            // Fall back to the generic Message type
+            if (jsonObject instanceof JsonObject) {
+                for (Map.Entry<String, JsonElement> pair: ((JsonObject) jsonObject).entrySet()) {
+                    String key = pair.getKey();
+                    if (key.startsWith("m.")) {
+                        message.add(key,pair.getValue());
+                    }
+                }
+            }
+
             return message;
         } catch (Exception e) {
             Log.e(LOG_TAG, "## toMessage failed " + e.getMessage());

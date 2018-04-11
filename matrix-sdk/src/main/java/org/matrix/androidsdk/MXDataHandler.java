@@ -50,12 +50,16 @@ import org.matrix.androidsdk.rest.client.ProfileRestClient;
 import org.matrix.androidsdk.rest.client.RoomsRestClient;
 import org.matrix.androidsdk.rest.client.ThirdPidRestClient;
 import org.matrix.androidsdk.rest.json.ConditionDeserializer;
+import org.matrix.androidsdk.rest.json.MessageSerializer;
 import org.matrix.androidsdk.rest.model.Event;
 import org.matrix.androidsdk.rest.model.MatrixError;
 import org.matrix.androidsdk.rest.model.ReceiptData;
 import org.matrix.androidsdk.rest.model.RoomAliasDescription;
 import org.matrix.androidsdk.rest.model.RoomMember;
 import org.matrix.androidsdk.rest.model.group.InvitedGroupSync;
+import org.matrix.androidsdk.rest.model.message.FileMessage;
+import org.matrix.androidsdk.rest.model.message.Message;
+import org.matrix.androidsdk.rest.model.message.VideoMessage;
 import org.matrix.androidsdk.rest.model.sync.InvitedRoomSync;
 import org.matrix.androidsdk.rest.model.sync.SyncResponse;
 import org.matrix.androidsdk.rest.model.User;
@@ -1023,6 +1027,9 @@ public class MXDataHandler implements IMXEventListener {
                             .setFieldNamingStrategy(new JsonUtils.MatrixFieldNamingStrategy())
                             .excludeFieldsWithModifiers(Modifier.PRIVATE, Modifier.STATIC)
                             .registerTypeAdapter(Condition.class, new ConditionDeserializer())
+                            .registerTypeAdapter(Message.class, new MessageSerializer())
+                            .registerTypeAdapter(VideoMessage.class, new MessageSerializer())
+                            .registerTypeAdapter(FileMessage.class, new MessageSerializer())
                             .create();
 
                     // convert the data to BingRulesResponse

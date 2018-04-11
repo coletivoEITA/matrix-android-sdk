@@ -15,6 +15,12 @@
  */
 package org.matrix.androidsdk.rest.model.message;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import java.lang.reflect.Modifier;
+import java.util.HashMap;
+
 public class Message {
     public static final String MSGTYPE_TEXT = "m.text";
     public static final String MSGTYPE_EMOTE = "m.emote";
@@ -31,4 +37,44 @@ public class Message {
 
     public String format;
     public String formatted_body;
+
+
+    /*************************************************************
+     * EXTRA CONTENTS                                            *
+     *************************************************************/
+
+    private JsonObject contentExtras = new JsonObject();
+
+    public void add(String property, JsonElement value) {
+        contentExtras.add(property,value);
+    }
+
+    public void add(String property, Boolean value) {
+        contentExtras.addProperty(property,value);
+    }
+
+    public void add(String property, Character value) {
+        contentExtras.addProperty(property,value);
+    }
+
+    public void add(String property, Number value) {
+        contentExtras.addProperty(property,value);
+    }
+
+    public void add(String property, String value) {
+        contentExtras.addProperty(property,value);
+    }
+
+    public JsonElement get(String property) {
+        return contentExtras.get(property);
+    }
+
+    public JsonElement remove(String property) {
+        return contentExtras.remove(property);
+    }
+
+    public JsonObject getContentExtras() {
+        return contentExtras;
+    }
+
 }
