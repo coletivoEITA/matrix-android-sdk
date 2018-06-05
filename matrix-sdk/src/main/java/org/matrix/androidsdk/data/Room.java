@@ -54,6 +54,7 @@ import org.matrix.androidsdk.rest.model.Event;
 import org.matrix.androidsdk.rest.model.MatrixError;
 import org.matrix.androidsdk.rest.model.PowerLevels;
 import org.matrix.androidsdk.rest.model.ReceiptData;
+import org.matrix.androidsdk.rest.model.RiosFolder;
 import org.matrix.androidsdk.rest.model.RoomMember;
 import org.matrix.androidsdk.rest.model.TokensChunkResponse;
 import org.matrix.androidsdk.rest.model.User;
@@ -539,6 +540,12 @@ public class Room {
 
     public String getVisibility() {
         return getState().visibility;
+    }
+
+    public List<RiosFolder> getDestinationFolders() { return this.getState().destinationFolders; }
+
+    public RiosFolder getDefaultFolder() {
+        return this.getState().defaultFolder;
     }
 
     /**
@@ -3104,5 +3111,22 @@ public class Room {
      */
     public boolean isDirect() {
         return mDataHandler.getDirectChatRoomIdsList().contains(getRoomId());
+    }
+
+    /**
+     * Update the room's default folder.
+     *
+     * @param defaultFolder the new default folder
+     * @param callback      the async callback
+     */
+    public void updateDefaultFolder(final RiosFolder defaultFolder, final ApiCallback<Void> callback) {
+
+        mDataHandler.getDataRetriever().getRoomsRestClient().updateDefaultFolder(getRoomId(), defaultFolder, new RoomInfoUpdateCallback<Void>(callback) {
+            @Override
+            public void onSuccess(Void info) {
+                getState().defaultFolder = defaultFolder;
+                super.onSuccess(info);
+            }
+        });
     }
 }

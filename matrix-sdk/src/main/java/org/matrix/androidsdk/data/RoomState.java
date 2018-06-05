@@ -21,8 +21,10 @@ import android.text.TextUtils;
 
 import org.matrix.androidsdk.data.store.IMXStore;
 import org.matrix.androidsdk.rest.callback.SimpleApiCallback;
+import org.matrix.androidsdk.rest.model.RiosFolder;
 import org.matrix.androidsdk.util.Log;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import org.matrix.androidsdk.MXDataHandler;
@@ -140,6 +142,11 @@ public class RoomState implements Externalizable {
 
     // group ids list which should be displayed
     public List<String> groups;
+
+    // available folders to upload the file in RIOS
+    public List<RiosFolder> destinationFolders = new ArrayList<RiosFolder>();;
+
+    public RiosFolder defaultFolder;
 
     /**
      * The number of unread messages that match the push notification rules.
@@ -952,6 +959,16 @@ public class RoomState implements Externalizable {
                     if (!TextUtils.isEmpty(thirdPartyInvite.token)) {
                         mThirdPartyInvites.put(thirdPartyInvite.token, thirdPartyInvite);
                     }
+                }
+            } else if (Event.EVENT_TYPE_STATE_RIOS_DEFAULT_FOLDER.equals(eventType)) {
+                defaultFolder = (RiosFolder) JsonUtils.toClass(contentToConsider.get("defaultFolder"),RiosFolder.class);
+            } else if (Event.EVENT_TYPE_STATE_RIOS_FOLDERS.equals(eventType)) {
+                destinationFolders = new ArrayList<RiosFolder>();
+
+                JsonArray folders = contentToConsider.getAsJsonArray("destinationFolders");
+
+                for (int i=0; i< folders.size(); i++) {
+                    destinationFolders.add((RiosFolder) JsonUtils.toClass(folders.get(i), RiosFolder.class));
                 }
             }
 

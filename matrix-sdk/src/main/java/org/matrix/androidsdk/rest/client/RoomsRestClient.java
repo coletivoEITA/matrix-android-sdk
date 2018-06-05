@@ -36,6 +36,7 @@ import org.matrix.androidsdk.rest.model.CreateRoomResponse;
 import org.matrix.androidsdk.rest.model.Event;
 import org.matrix.androidsdk.rest.model.EventContext;
 import org.matrix.androidsdk.rest.model.MatrixError;
+import org.matrix.androidsdk.rest.model.RiosFolder;
 import org.matrix.androidsdk.rest.model.message.Message;
 import org.matrix.androidsdk.rest.model.PowerLevels;
 import org.matrix.androidsdk.rest.model.ReportContentParams;
@@ -1137,6 +1138,31 @@ public class RoomsRestClient extends RestClient<RoomsApi> {
                 @Override
                 public void onRetry() {
                     updateGuestAccess(aRoomId, aGuestAccessRule, callback);
+                }
+            }));
+        } catch (Throwable t) {
+            callback.onUnexpectedError(new Exception(t));
+        }
+    }
+
+    /**
+     * Update the room default folder.
+     *
+     * @param roomId        the room id
+     * @param defaultFolder the room topic
+     * @param callback      the async callback
+     */
+    public void updateDefaultFolder(final String roomId, final RiosFolder defaultFolder, final ApiCallback<Void> callback) {
+        final String description = "updateDefaultFolder : roomId " + roomId + " defaultFolder " + defaultFolder.id;
+
+        RoomState roomState = new RoomState();
+        roomState.defaultFolder = defaultFolder;
+
+        try {
+            mApi.setRoomDefaultFolder(roomId, roomState, new RestAdapterCallback<Void>(description, mUnsentEventsManager, callback, new RestAdapterCallback.RequestRetryCallBack() {
+                @Override
+                public void onRetry() {
+                    updateDefaultFolder(roomId, defaultFolder, callback);
                 }
             }));
         } catch (Throwable t) {

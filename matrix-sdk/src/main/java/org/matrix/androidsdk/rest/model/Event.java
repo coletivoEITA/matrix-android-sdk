@@ -106,6 +106,10 @@ public class Event implements Externalizable {
     public static final String EVENT_TYPE_STATE_HISTORY_VISIBILITY = "m.room.history_visibility";
     public static final String EVENT_TYPE_STATE_RELATED_GROUPS = "m.room.related_groups";
 
+    public static final String EVENT_TYPE_STATE_RIOS_FOLDERS = "m.room.rios.destination_folders";
+    public static final String EVENT_TYPE_STATE_RIOS_DEFAULT_FOLDER = "m.room.rios.default_folder";
+
+
     // call events
     public static final String EVENT_TYPE_CALL_INVITE = "m.call.invite";
     public static final String EVENT_TYPE_CALL_CANDIDATES = "m.call.candidates";

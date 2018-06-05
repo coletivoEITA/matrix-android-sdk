@@ -169,6 +169,17 @@ public interface RoomsApi {
     @PUT("/rooms/{roomId}/state/{state_event_type}/{stateKey}")
     void sendStateEvent(@Path("roomId") String roomId, @Path("state_event_type") String stateEventType, @Path("stateKey") String stateKey, @Body Map<String, Object> params, Callback<Void> callback);
 
+
+    /**
+     * Set the room default folder.
+     *
+     * @param roomId   the room id
+     * @param state    state object containing the new topic in the topic field
+     * @param callback the asynchronous callback called with the response
+     */
+    @PUT("/rooms/{roomId}/state/m.room.rios.default_folder")
+    void setRoomDefaultFolder(@Path("roomId") String roomId, @Body RoomState state, Callback<Void> callback);
+
     /**
      * Looks up the contents of a state event in a room
      *
